@@ -33,14 +33,15 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ProductResponse>> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "id,asc") String[] sort, @RequestParam(required = false) String model, @RequestParam(required = false) String brand, @RequestParam(required = false) Double minPrice, @RequestParam(required = false) Double maxPrice, @RequestParam(required = false) Boolean onSale, @RequestParam(required = false) Boolean inStock) {
-        log.info("Getting all products with page: {}, size: {}, sort: {}, model: {}, brand: {}, minPrice: {}, maxPrice: {}, onSale: {}, inStock: {}", page, size, sort, model, brand, minPrice, maxPrice, onSale, inStock);
+    public ResponseEntity<Page<ProductResponse>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,asc") String[] sort,
+            @ModelAttribute ProductFilter filter) {
+        log.info("Getting all products with page: {}, size: {}, sort: {}, filters: {}", page, size, sort, filter);
 
         // Create a Pageable object for pagination and ordering
         Pageable pageable = PageRequest.of(page, size, getSortDirection(sort), sort[0]);
-
-        // Create a ProductFilter object to hold the filter criteria
-        ProductFilter filter = new ProductFilter(model, brand, minPrice, maxPrice, onSale, inStock);
 
         // Get the product page based on the filter criteria
         Page<ProductResponse> productPage = productService.getAll(filter, pageable);
