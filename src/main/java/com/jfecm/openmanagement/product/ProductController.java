@@ -1,5 +1,6 @@
 package com.jfecm.openmanagement.product;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -9,15 +10,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@AllArgsConstructor
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/product-inventory")
 public class ProductController {
-    private final ProductService productService;
 
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
+    private final ProductService productService;
 
     @PostMapping
     public ResponseEntity<ProductResponse> create(@RequestBody ProductRequest product) {

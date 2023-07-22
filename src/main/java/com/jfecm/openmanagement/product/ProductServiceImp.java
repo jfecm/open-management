@@ -1,20 +1,18 @@
 package com.jfecm.openmanagement.product;
 
 import com.jfecm.openmanagement.exception.ResourceNotFoundException;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+@AllArgsConstructor
 @Service
 public class ProductServiceImp implements ProductService {
+
     private final ProductRepository productRepository;
     private final ProductConvert productConvert;
-
-    public ProductServiceImp(ProductRepository productRepository, ProductConvert productConvert) {
-        this.productRepository = productRepository;
-        this.productConvert = productConvert;
-    }
 
     @Override
     public ProductResponse create(ProductRequest product) {
