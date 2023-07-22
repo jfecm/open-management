@@ -1,11 +1,15 @@
 package com.jfecm.openmanagement.product;
 
 import com.jfecm.openmanagement.exception.ResourceNotFoundException;
+import com.jfecm.openmanagement.notification.Constants;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -64,6 +68,14 @@ public class ProductServiceImp implements ProductService {
 
         // Convert each Product entity to a ProductResponse entity
         return products.map(productConvert::ToResponse);
+    }
+
+    @Override
+    public List<ProductResponse> getProductsInLowStock() {
+        return productRepository.findByAvailableQuantityLessThan(Constants.LOW_STOCK_THRESHOLD)
+                .stream()
+                .map(productConvert::ToResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
