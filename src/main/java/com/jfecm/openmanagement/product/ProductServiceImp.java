@@ -55,6 +55,10 @@ public class ProductServiceImp implements ProductService {
             specification = specification.and((root, query, builder) -> builder.equal(root.get("inStock"), filter.getInStock()));
         }
 
+        if (filter.getAvailableQuantity() >= 0) {
+            specification = specification.and((root, query, builder) -> builder.lessThan(root.get("availableQuantity"), filter.getAvailableQuantity()));
+        }
+
         // Get the product page using the spec and the pageable
         Page<Product> products = productRepository.findAll(specification, pageable);
 
