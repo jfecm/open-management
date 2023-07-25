@@ -75,11 +75,11 @@ public class ProductServiceImp implements ProductService {
             specification = specification.and((root, query, builder) -> builder.like(builder.lower(root.get("brand")), "%" + filter.getBrand().toLowerCase() + "%"));
         }
 
-        if (filter.getMinPrice() != null) {
+        if (filter.getMinPrice() != null && filter.getMinPrice() > 0) {
             specification = specification.and((root, query, builder) -> builder.greaterThanOrEqualTo(root.get("price"), filter.getMinPrice()));
         }
 
-        if (filter.getMaxPrice() != null) {
+        if (filter.getMaxPrice() != null && filter.getMaxPrice() > 0) {
             specification = specification.and((root, query, builder) -> builder.lessThanOrEqualTo(root.get("price"), filter.getMaxPrice()));
         }
 
@@ -91,14 +91,16 @@ public class ProductServiceImp implements ProductService {
             specification = specification.and((root, query, builder) -> builder.equal(root.get("inStock"), filter.getInStock()));
         }
 
-        if (filter.getAvailableQuantity() >= 0) {
+        if (filter.getAvailableQuantity() != null && filter.getAvailableQuantity() >= 0) {
             specification = specification.and((root, query, builder) -> builder.lessThan(root.get("availableQuantity"), filter.getAvailableQuantity()));
         }
 
+        log.info("Total Size before filtering: {}", productRepository.findAll().size());
         log.debug("Executing the query to retrieve products based on the provided filter and pageable");
         // Get the product page using the spec and the pageable
         Page<Product> products = productRepository.findAll(specification, pageable);
 
+        log.info("Total Size after filtering: {}", products.getTotalElements());
         log.debug("Converting each Product entity to a ProductResponse entity");
         // Convert each Product entity to a ProductResponse entity
         return products.map(productConvert::ToResponse);
