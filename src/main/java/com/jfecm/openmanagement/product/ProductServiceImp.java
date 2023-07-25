@@ -1,6 +1,7 @@
 package com.jfecm.openmanagement.product;
 
 import com.jfecm.openmanagement.exception.NullProductDataException;
+import com.jfecm.openmanagement.exception.ProductNameAlreadyExistsException;
 import com.jfecm.openmanagement.exception.ResourceNotFoundException;
 import com.jfecm.openmanagement.notification.Constants;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,12 @@ public class ProductServiceImp implements ProductService {
         log.info("Creating a new product: {}", product.getName());
         log.debug("Product details: {}", product);
         log.trace("Entering create() method");
+
+        if (productRepository.findByName(product.getName()).isPresent()) {
+            log.warn("Product with name {} already exists. Cannot create a new product with the same name.", product.getName());
+            throw new ProductNameAlreadyExistsException("A product with the same name already exists.");
+        }
+
         try {
             Product savedProduct = productRepository.save(productConvert.toEntity(product));
             log.info("Product created successfully with ID: {}", savedProduct.getId());
@@ -124,14 +131,13 @@ public class ProductServiceImp implements ProductService {
     @Override
     public ProductResponse update(Long id, ProductRequest product) {
         log.debug("Updating product with ID: {}", id);
-
+        log.info("Product details after update: {}", product);
         Product existingProduct = findOneOrThrow(id);
 
-        productConvert.toUpdate(id, product, existingProduct);
+        productConvert.toUpdate(product, existingProduct);
         Product updatedProduct = productRepository.save(existingProduct);
 
-        log.info("Product updated successfully with ID: {}", id);
-        log.trace("Product details after update: {}", updatedProduct);
+        log.info("Product details before updated successfully {}", updatedProduct);
         log.debug("Product updated: {}", updatedProduct);
 
         return productConvert.ToResponse(updatedProduct);

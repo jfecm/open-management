@@ -13,9 +13,9 @@ public class ProductResponse {
     private Long id;
     private String name;
     private String description;
-    private double price;
-    private int availableQuantity;
-    private boolean onSale;
+    private Double price;
+    private Integer availableQuantity;
+    private Boolean onSale;
     private String brand;
     private String model;
     private String color;
@@ -23,6 +23,6 @@ public class ProductResponse {
     private String operatingSystem;
     private String type;
     private String imageURL;
-    private boolean inStock;
+    private Boolean inStock;
     private Date releaseDate;
 }
