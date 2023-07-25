@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,4 +16,5 @@ public class ErrorMessage {
     private String message;
     private String requestDescription;
     private long timestamp;
+    private List<String> fieldErrors;
 }
