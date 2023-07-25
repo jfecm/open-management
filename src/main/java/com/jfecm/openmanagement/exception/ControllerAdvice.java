@@ -52,4 +52,14 @@ public class ControllerAdvice {
         message.setTimestamp(System.currentTimeMillis());
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = NullProductDataException.class)
+    public ResponseEntity<ErrorMessage> handleNullProductDataException(NullProductDataException ex, WebRequest request) {
+        ErrorMessage message = new ErrorMessage();
+        message.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        message.setMessage(ex.getMessage());
+        message.setRequestDescription(request.getDescription(false));
+        message.setTimestamp(System.currentTimeMillis());
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
 }
