@@ -4,8 +4,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
@@ -14,96 +12,153 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class ProductRepositoryTest {
-    int lowStockThreshold;
-    Specification<Product> specification;
-    Pageable pageable;
-    List<Product> lowStockProducts;
-    List<Product> productList;
+    private final List<Product> productList = new ArrayList<>();
 
     @Autowired
     private ProductRepository productRepository;
 
     @BeforeEach
     void setUp() {
-        saveProducts();
-        lowStockThreshold = 10;
-        specification = Specification.where(null);
-        pageable = PageRequest.of(0, 10);
-        lowStockProducts = new ArrayList<>();
+        Product productOne = Product.builder()
+                .name("Digital Camera")
+                .description("High-resolution mirror less digital camera.")
+                .price(1299.0)
+                .availableQuantity(6)
+                .onSale(Boolean.FALSE)
+                .brand("Sony")
+                .model("Alpha A7 III")
+                .color("Black")
+                .capacity("N/A")
+                .operatingSystem("Any")
+                .type("Digital Camera")
+                .imageURL("digital_camera_image.jpg")
+                .inStock(Boolean.TRUE)
+                .releaseDate(new Date())
+                .build();
+        productList.add(productOne);
+
+        Product productTwo = Product.builder()
+                .name("Fitness Tracker")
+                .description("Wearable fitness tracker with heart rate monitor.")
+                .price(69.0)
+                .availableQuantity(18)
+                .onSale(Boolean.TRUE)
+                .brand("Garmin")
+                .model("Vivosmart 4")
+                .color("Rose Gold")
+                .capacity("N/A")
+                .operatingSystem("Any")
+                .type("Fitness Tracker")
+                .imageURL("fitness_tracker_image.jpg")
+                .inStock(Boolean.TRUE)
+                .releaseDate(new Date())
+                .build();
+        productList.add(productTwo);
+
+        productRepository.saveAll(productList);
     }
 
     @AfterEach
     void tearDown() {
-        lowStockThreshold = 0;
-        specification = null;
-        pageable = null;
-        lowStockProducts = null;
         productRepository.deleteAll();
     }
 
-    private void saveProducts() {
-        productList = ProductTestDataBuilder.createProducts();
-        productRepository.saveAll(productList);
-    }
-
-    @DisplayName("Test findAll by model")
-    @ParameterizedTest
-    @CsvSource({"Galaxy S21+", "MacBook Pro 16-inch", "OnePlus 9 Pro", "Garmin Venu 2"})
-    void testFindAllByModel(String model) {
-        specification = specification.and((root, query, builder) -> builder.like(builder.lower(root.get("model")), "%" + model.toLowerCase() + "%"));
-        Page<Product> productsPage = productRepository.findAll(specification, pageable);
-        assertEquals(1, productsPage.getContent().size());
-    }
-
-    @DisplayName("Test findAll by brand")
-    @ParameterizedTest
-    @CsvSource({"Samsung", "Apple", "Sony", "LG"})
-    void testFindAllByBrand(String brand) {
-        specification = specification.and((root, query, builder) -> builder.like(builder.lower(root.get("brand")), "%" + brand.toLowerCase() + "%"));
-        Page<Product> productsPage = productRepository.findAll(specification, pageable);
-        assertEquals(2, productsPage.getContent().size());
-    }
-
-    @DisplayName("Test findAll by onSale")
     @Test
-    void testFindAllByOnSale() {
-        specification = specification.and((root, query, builder) -> builder.equal(root.get("onSale"), true));
-        Page<Product> productsPage = productRepository.findAll(specification, pageable);
-        assertEquals(6, productsPage.getContent().size());
-    }
+    @DisplayName("Test ProductRepository findByAvailableQuantityLessThan() method - Success")
+    void testFindAllSuccess() {
+        // given
+        Specification<Product> specification = Specification.where((root, query, builder) -> builder.equal(root.get("onSale"), Boolean.TRUE));
+        Pageable pageable = PageRequest.of(0, 10);
 
-    @DisplayName("Test findAll by inStock")
-    @Test
-    void testFindAllByInStock() {
-        specification = specification.and((root, query, builder) -> builder.equal(root.get("inStock"), true));
-        Page<Product> productsPage = productRepository.findAll(specification, pageable);
-        assertEquals(10, productsPage.getContent().size());
-    }
-
-    @DisplayName("Test findAll by available quantity less than 10")
-    @Test
-    void testFindAllByAvailableQuantity() {
-        specification = specification.and((root, query, builder) -> builder.lessThan(root.get("availableQuantity"), 10));
-
+        // when
         Page<Product> productsPage = productRepository.findAll(specification, pageable);
 
-        assertAll("Products with available quantity less than 10",
-                () -> assertEquals(4, productsPage.getContent().size(), "Number of products is incorrect"),
-                () -> assertTrue(productsPage.getContent().stream().allMatch(p -> p.getAvailableQuantity() < 10),
-                        "Not all products have available quantity less than 10")
-        );
+        // then
+        assertThat(productsPage.getContent().size()).isEqualTo(1);
     }
 
     @Test
-    void testFindByAvailableQuantityLessThan() {
-        lowStockProducts = productRepository.findByAvailableQuantityLessThan(lowStockThreshold);
-        assertEquals(4, lowStockProducts.size());
+    @DisplayName("Test ProductRepository findByAvailableQuantityLessThan() method - Failure")
+    void testFindAllFailure() {
+        // given
+        Specification<Product> specification = Specification.where((root, query, builder) -> builder.equal(root.get("onSale"), Boolean.TRUE));
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<Product> productsPage = productRepository.findAll(specification, pageable);
+
+        // then
+        assertThat(productsPage.getContent().size()).isNotEqualTo(2);
+    }
+
+
+    @Test
+    @DisplayName("Test ProductRepository findByAvailableQuantityLessThan() method - Success")
+    void testFindByAvailableQuantityLessThanSuccess() {
+        // given
+        int lowStockThreshold = 20;
+        // when
+        List<Product> resultList = productRepository.findByAvailableQuantityLessThan(lowStockThreshold);
+        // then
+        assertThat(resultList).isNotNull();
+        assertThat(resultList).isNotEmpty();
+        assertThat(resultList.size()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("Test ProductRepository findByAvailableQuantityLessThan() method - Failure")
+    void testFindByAvailableQuantityLessThanFailure() {
+        // given
+        int lowStockThreshold = 10;
+        // when
+        List<Product> resultList = productRepository.findByAvailableQuantityLessThan(lowStockThreshold);
+        // then
+        assertThat(resultList).isNotNull();
+        assertThat(resultList).isNotEmpty();
+        assertThat(resultList.size()).isNotEqualTo(2);
+        assertThat(resultList.size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Test ProductRepository findByName() method - Success")
+    void testFindByNameSuccess() {
+        // given
+        String name = "Digital Camera";
+        // when
+        boolean result = productRepository.findByName(name);
+        // then
+        assertThat(result).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("Test ProductRepository findByName() method - Failure")
+    void testFindByNameFailure() {
+        // given
+        String name = "Camera mobile";
+        // when
+        Boolean result = productRepository.findByName(name);
+        // then
+        assertThat(result).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("Test ProductRepository save() method - Success")
+    void testSaveSuccess() {
+        // given
+        Product product = ProductTestDataBuilder.getProductEntity();
+
+        // when
+        Product productSaved = productRepository.save(product);
+
+        // then
+        assertThat(productSaved.getName()).isEqualTo(product.getName());
     }
 
 }

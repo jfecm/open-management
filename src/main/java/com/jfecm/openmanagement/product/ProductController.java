@@ -1,5 +1,6 @@
 package com.jfecm.openmanagement.product;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,7 +20,7 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<ProductResponse> create(@RequestBody ProductRequest product) {
+    public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest product) {
         log.info("Creating a new product: {}", product);
         // Create a new product and return the response with code 201 (CREATED)
         return new ResponseEntity<>(productService.create(product), HttpStatus.CREATED);

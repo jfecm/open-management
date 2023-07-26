@@ -62,4 +62,14 @@ public class ControllerAdvice {
         message.setTimestamp(System.currentTimeMillis());
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = ProductNameAlreadyExistsException.class)
+    public ResponseEntity<ErrorMessage> productNameAlreadyExistsException(ProductNameAlreadyExistsException ex, WebRequest request) {
+        ErrorMessage message = new ErrorMessage();
+        message.setStatusCode(HttpStatus.CONFLICT.value());
+        message.setMessage(ex.getMessage());
+        message.setRequestDescription(request.getDescription(false));
+        message.setTimestamp(System.currentTimeMillis());
+        return new ResponseEntity<>(message, HttpStatus.CONFLICT);
+    }
 }
