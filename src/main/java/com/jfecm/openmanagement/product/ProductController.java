@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
@@ -20,20 +21,21 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
     public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest product) {
         log.info("Creating a new product: {}", product);
         // Create a new product and return the response with code 201 (CREATED)
         return new ResponseEntity<>(productService.create(product), HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/products/{id}")
     public ResponseEntity<ProductResponse> get(@PathVariable Long id) {
         log.info("Getting product by id: {}", id);
         // Get the product by its id and return the response with code 200 (OK)
         return new ResponseEntity<>(productService.get(id), HttpStatus.OK);
     }
 
-    @GetMapping
+    @GetMapping("/products/all-products")
     public ResponseEntity<Page<ProductResponse>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -51,6 +53,7 @@ public class ProductController {
 
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
     public ResponseEntity<ProductResponse> update(@PathVariable Long id, @RequestBody ProductRequest product) {
         log.info("Updating product with id: {}, data: {}", id, product);
         // Update the product by its id and return the response with code 200 (OK)
@@ -58,6 +61,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}/stock")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
     public ResponseEntity<ProductResponse> updateStock(@PathVariable Long id, @RequestParam Boolean inStock) {
         log.info("Updating stock for product with ID: {}", id);
         ProductResponse updatedProduct = productService.updateStock(id, inStock);
@@ -65,6 +69,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}/sale")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
     public ResponseEntity<ProductResponse> updateSale(@PathVariable Long id, @RequestParam Boolean onSale) {
         log.info("Updating onSale for product with ID: {}", id);
         ProductResponse updatedProduct = productService.updateSale(id, onSale);
@@ -72,6 +77,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}/stock-and-sale")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
     public ResponseEntity<ProductResponse> updateStockAndSale(@PathVariable Long id, @RequestParam(required = false) Boolean inStock, @RequestParam(required = false) Boolean onSale) {
         log.info("Updating stock and sale for product with ID: {}", id);
         ProductResponse updatedProduct = productService.updateStockAndSale(id, inStock, onSale);
@@ -79,6 +85,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         log.info("Deleting product with id: {}", id);

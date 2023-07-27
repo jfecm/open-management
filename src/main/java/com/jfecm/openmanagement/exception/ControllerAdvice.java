@@ -72,4 +72,14 @@ public class ControllerAdvice {
         message.setTimestamp(System.currentTimeMillis());
         return new ResponseEntity<>(message, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(value = InvalidTokenException.class)
+    public ResponseEntity<ErrorMessage> invalidTokenException(InvalidTokenException ex, WebRequest request) {
+        ErrorMessage errorResponse = new ErrorMessage();
+        errorResponse.setStatusCode(HttpStatus.UNAUTHORIZED.value());
+        errorResponse.setMessage(ex.getMessage());
+        errorResponse.setRequestDescription(request.getDescription(false));
+        errorResponse.setTimestamp(System.currentTimeMillis());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
 }
