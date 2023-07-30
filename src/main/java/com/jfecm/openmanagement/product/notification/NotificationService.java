@@ -1,6 +1,6 @@
-package com.jfecm.openmanagement.notification;
+package com.jfecm.openmanagement.product.notification;
 
-import com.jfecm.openmanagement.product.ProductResponse;
+import com.jfecm.openmanagement.product.dtos.ProductResponse;
 
 import java.util.List;
 

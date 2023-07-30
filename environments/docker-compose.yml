@@ -1,5 +1,15 @@
 version: '3.8'
 services:
+  app:
+    container_name: open_management_container
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    environment:
+      - MYSQL_URL=jdbc:mysql://db/open_management_db
+    depends_on:
+      - db
   db:
     container_name: mysql_container
     image: mysql:8.0

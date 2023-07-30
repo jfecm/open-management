@@ -1,5 +1,6 @@
-package com.jfecm.openmanagement.product;
+package com.jfecm.openmanagement.product.repository;
 
+import com.jfecm.openmanagement.product.model.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

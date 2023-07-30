@@ -1,9 +1,16 @@
-package com.jfecm.openmanagement.product;
+package com.jfecm.openmanagement.product.service;
 
+import com.jfecm.openmanagement.exception.ErrorMessageConstants;
 import com.jfecm.openmanagement.exception.NullProductDataException;
 import com.jfecm.openmanagement.exception.ProductNameAlreadyExistsException;
 import com.jfecm.openmanagement.exception.ResourceNotFoundException;
-import com.jfecm.openmanagement.notification.Constants;
+import com.jfecm.openmanagement.product.dtos.ProductFilter;
+import com.jfecm.openmanagement.product.dtos.ProductRequest;
+import com.jfecm.openmanagement.product.dtos.ProductResponse;
+import com.jfecm.openmanagement.product.model.Product;
+import com.jfecm.openmanagement.product.notification.Constants;
+import com.jfecm.openmanagement.product.repository.ProductRepository;
+import com.jfecm.openmanagement.product.util.ProductModelMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,10 +24,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class ProductServiceImp implements ProductService {
+public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-    private final ProductConvert productConvert;
+    private final ProductModelMapper productModelMapper;
 
     @Override
     public ProductResponse create(ProductRequest product) {
@@ -28,17 +35,17 @@ public class ProductServiceImp implements ProductService {
 
         if (product == null) {
             log.warn("Attempted to create a product with null product data.");
-            throw new NullProductDataException("Product data cannot be null.");
+            throw new NullProductDataException(ErrorMessageConstants.NULL_PRODUCT_DATA);
         }
 
         if (productRepository.findByName(product.getName())) {
             log.warn("Product with name {} already exists. Cannot create a new product with the same name.", product.getName());
-            throw new ProductNameAlreadyExistsException("A product with the same name already exists.");
+            throw new ProductNameAlreadyExistsException(ErrorMessageConstants.PRODUCT_NAME_ALREADY_EXISTS);
         }
 
-        Product savedProduct = productRepository.save(productConvert.toEntity(product));
+        Product savedProduct = productRepository.save(productModelMapper.toEntity(product));
         log.info("Product created successfully with ID: {}", savedProduct.getId());
-        return productConvert.ToResponse(savedProduct);
+        return productModelMapper.ToResponse(savedProduct);
     }
 
     @Override
@@ -46,7 +53,7 @@ public class ProductServiceImp implements ProductService {
         log.debug("Getting product with ID: {}", id);
         Product product = findOneOrThrow(id);
         log.trace("Product details: {}", product);
-        return productConvert.ToResponse(product);
+        return productModelMapper.ToResponse(product);
     }
 
     @Override
@@ -91,7 +98,7 @@ public class ProductServiceImp implements ProductService {
         log.info("Total Size after filtering: {}", products.getTotalElements());
         log.debug("Converting each Product entity to a ProductResponse entity");
         // Convert each Product entity to a ProductResponse entity
-        return products.map(productConvert::ToResponse);
+        return products.map(productModelMapper::ToResponse);
     }
 
     @Override
@@ -100,7 +107,7 @@ public class ProductServiceImp implements ProductService {
 
         List<Product> products = productRepository.findByAvailableQuantityLessThan(Constants.LOW_STOCK_THRESHOLD);
 
-        List<ProductResponse> productResponses = products.stream().map(productConvert::ToResponse).collect(Collectors.toList());
+        List<ProductResponse> productResponses = products.stream().map(productModelMapper::ToResponse).collect(Collectors.toList());
 
         log.debug("ProductResponses with low stock: {}", productResponses);
 
@@ -112,12 +119,12 @@ public class ProductServiceImp implements ProductService {
         log.info("Updating product with ID: {} - Product details before update: {}", id, product);
         Product existingProduct = findOneOrThrow(id);
 
-        productConvert.toUpdate(product, existingProduct);
+        productModelMapper.toUpdate(product, existingProduct);
         Product updatedProduct = productRepository.save(existingProduct);
 
         log.info("Product details after updated successfully {}", updatedProduct);
 
-        return productConvert.ToResponse(updatedProduct);
+        return productModelMapper.ToResponse(updatedProduct);
     }
 
     @Override
@@ -132,7 +139,7 @@ public class ProductServiceImp implements ProductService {
         log.info("Product stock updated successfully with ID: {}", id);
         log.info("Product details after stock update: {}", updatedProduct);
 
-        return productConvert.ToResponse(updatedProduct);
+        return productModelMapper.ToResponse(updatedProduct);
     }
 
     @Override
@@ -146,7 +153,7 @@ public class ProductServiceImp implements ProductService {
 
         log.info("Product details after sale status update: {}", updatedProduct);
 
-        return productConvert.ToResponse(updatedProduct);
+        return productModelMapper.ToResponse(updatedProduct);
     }
 
     @Override
@@ -161,7 +168,7 @@ public class ProductServiceImp implements ProductService {
 
         log.info("Product details after stock and sale status update: {}", updatedProduct);
 
-        return productConvert.ToResponse(updatedProduct);
+        return productModelMapper.ToResponse(updatedProduct);
     }
 
     @Override
@@ -175,7 +182,7 @@ public class ProductServiceImp implements ProductService {
         log.info("Finding product with ID: {}", id);
         Product product = productRepository.findById(id).orElseThrow(() -> {
             log.warn("Product with ID {} not found", id);
-            return new ResourceNotFoundException("No product found with id " + id);
+            return new ResourceNotFoundException(ErrorMessageConstants.PRODUCT_NOT_FOUND + id);
         });
         log.info("Product details: {}", product);
         return product;

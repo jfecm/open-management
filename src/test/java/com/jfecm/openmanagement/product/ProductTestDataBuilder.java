@@ -1,5 +1,8 @@
 package com.jfecm.openmanagement.product;
 
+import com.jfecm.openmanagement.product.dtos.ProductRequest;
+import com.jfecm.openmanagement.product.model.Product;
+
 import java.util.Date;
 
 public class ProductTestDataBuilder {

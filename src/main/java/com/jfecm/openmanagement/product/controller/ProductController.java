@@ -1,5 +1,9 @@
-package com.jfecm.openmanagement.product;
+package com.jfecm.openmanagement.product.controller;
 
+import com.jfecm.openmanagement.product.dtos.ProductFilter;
+import com.jfecm.openmanagement.product.dtos.ProductRequest;
+import com.jfecm.openmanagement.product.dtos.ProductResponse;
+import com.jfecm.openmanagement.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

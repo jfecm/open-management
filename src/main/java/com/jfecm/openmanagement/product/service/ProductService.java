@@ -1,5 +1,9 @@
-package com.jfecm.openmanagement.product;
+package com.jfecm.openmanagement.product.service;
 
+import com.jfecm.openmanagement.product.dtos.ProductFilter;
+import com.jfecm.openmanagement.product.dtos.ProductRequest;
+import com.jfecm.openmanagement.product.dtos.ProductResponse;
+import com.jfecm.openmanagement.product.model.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

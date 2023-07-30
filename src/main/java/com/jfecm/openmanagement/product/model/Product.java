@@ -1,4 +1,4 @@
-package com.jfecm.openmanagement.product;
+package com.jfecm.openmanagement.product.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;

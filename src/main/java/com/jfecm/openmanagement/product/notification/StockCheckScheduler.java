@@ -1,7 +1,7 @@
-package com.jfecm.openmanagement.notification;
+package com.jfecm.openmanagement.product.notification;
 
-import com.jfecm.openmanagement.product.ProductResponse;
-import com.jfecm.openmanagement.product.ProductService;
+import com.jfecm.openmanagement.product.dtos.ProductResponse;
+import com.jfecm.openmanagement.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;

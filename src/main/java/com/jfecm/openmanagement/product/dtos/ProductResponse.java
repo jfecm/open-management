@@ -1,4 +1,4 @@
-package com.jfecm.openmanagement.product;
+package com.jfecm.openmanagement.product.dtos;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

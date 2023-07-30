@@ -3,6 +3,9 @@ package com.jfecm.openmanagement.product;
 import com.jfecm.openmanagement.exception.NullProductDataException;
 import com.jfecm.openmanagement.exception.ProductNameAlreadyExistsException;
 import com.jfecm.openmanagement.exception.ResourceNotFoundException;
+import com.jfecm.openmanagement.product.dtos.ProductRequest;
+import com.jfecm.openmanagement.product.repository.ProductRepository;
+import com.jfecm.openmanagement.product.service.ProductServiceImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,9 +22,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class ProductServiceImpTest {
+class ProductServiceImplTest {
     @InjectMocks
-    private ProductServiceImp productService;
+    private ProductServiceImpl productService;
     @Mock
     private ProductRepository productRepository;
 

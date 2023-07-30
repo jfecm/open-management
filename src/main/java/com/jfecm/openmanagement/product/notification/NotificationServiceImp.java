@@ -1,6 +1,6 @@
-package com.jfecm.openmanagement.notification;
+package com.jfecm.openmanagement.product.notification;
 
-import com.jfecm.openmanagement.product.ProductResponse;
+import com.jfecm.openmanagement.product.dtos.ProductResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

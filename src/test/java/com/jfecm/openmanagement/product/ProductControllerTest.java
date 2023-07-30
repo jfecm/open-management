@@ -3,6 +3,12 @@ package com.jfecm.openmanagement.product;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.jfecm.openmanagement.product.controller.ProductController;
+import com.jfecm.openmanagement.product.dtos.ProductRequest;
+import com.jfecm.openmanagement.product.dtos.ProductResponse;
+import com.jfecm.openmanagement.product.model.Product;
+import com.jfecm.openmanagement.product.service.ProductService;
+import com.jfecm.openmanagement.product.util.ProductModelMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,7 +38,7 @@ class ProductControllerTest {
     ProductRequest productRequest;
     ProductResponse productResponse;
     List<Product> productList;
-    private ProductConvert productConvert;
+    private ProductModelMapper productModelMapper;
     @Autowired
     private MockMvc mockMvc;
     @MockBean
@@ -40,7 +46,7 @@ class ProductControllerTest {
 
     @BeforeEach
     void setUp() {
-        productConvert = new ProductConvert(new ModelMapper());
+        productModelMapper = new ProductModelMapper(new ModelMapper());
         productResponse = new ProductResponse();
         productRequest = ProductRequest
                 .builder()
@@ -98,7 +104,7 @@ class ProductControllerTest {
     @DisplayName("Test ProductController get() method - Success")
     void testGet() throws Exception {
         Long productId = 1L;
-        when(productService.get(productId)).thenReturn(productConvert.ToResponse(productOne));
+        when(productService.get(productId)).thenReturn(productModelMapper.ToResponse(productOne));
 
         this.mockMvc
                 .perform(
