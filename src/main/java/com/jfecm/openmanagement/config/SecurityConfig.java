@@ -36,7 +36,14 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/api/v1/product-inventory/products/**").permitAll();
+                    auth.requestMatchers("/api/v1/doc/product-inventory/**",
+                                    "/swagger-ui-open-management.html",
+                                    "/swagger-ui/**",
+                                    "/swagger-resources/**",
+                                    "/webjars/**")
+                            .permitAll();
+                    auth.requestMatchers("/api/v1/product-inventory/products/**")
+                            .permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
