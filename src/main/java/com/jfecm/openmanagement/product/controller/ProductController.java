@@ -5,7 +5,6 @@ import com.jfecm.openmanagement.product.dtos.ProductRequest;
 import com.jfecm.openmanagement.product.dtos.ProductResponse;
 import com.jfecm.openmanagement.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -30,7 +29,6 @@ public class ProductController {
     private final ProductService productService;
 
     @Operation(summary = "Requires having the role of ADMIN or INVENTORY MANAGER. Create a new product.")
-    @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
     public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest product) {
@@ -66,7 +64,6 @@ public class ProductController {
 
 
     @Operation(summary = "Requires having the role of ADMIN or INVENTORY MANAGER. Update the product by its id.")
-    @SecurityRequirement(name = "Bearer Authentication")
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
     public ResponseEntity<ProductResponse> update(@PathVariable Long id, @RequestBody ProductRequest product) {
@@ -76,7 +73,6 @@ public class ProductController {
     }
 
     @Operation(summary = "Requires having the role of ADMIN or INVENTORY MANAGER. Update the stock of a product given its id.")
-    @SecurityRequirement(name = "Bearer Authentication")
     @PutMapping("/{id}/stock")
     @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
     public ResponseEntity<ProductResponse> updateStock(@PathVariable Long id, @RequestParam Boolean inStock) {
@@ -86,7 +82,6 @@ public class ProductController {
     }
 
     @Operation(summary = "Requires having the role of ADMIN or INVENTORY MANAGER. Update the sale of a product given its id.")
-    @SecurityRequirement(name = "Bearer Authentication")
     @PutMapping("/{id}/sale")
     @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
     public ResponseEntity<ProductResponse> updateSale(@PathVariable Long id, @RequestParam Boolean onSale) {
@@ -96,7 +91,6 @@ public class ProductController {
     }
 
     @Operation(summary = "Requires having the role of ADMIN or INVENTORY MANAGER. Update the stock and sale of a product given its id.")
-    @SecurityRequirement(name = "Bearer Authentication")
     @PutMapping("/{id}/stock-and-sale")
     @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
     public ResponseEntity<ProductResponse> updateStockAndSale(@PathVariable Long id, @RequestParam(required = false) Boolean inStock, @RequestParam(required = false) Boolean onSale) {
@@ -106,7 +100,6 @@ public class ProductController {
     }
 
     @Operation(summary = "Requires having the role of ADMIN or INVENTORY MANAGER. Remove the product by its id.")
-    @SecurityRequirement(name = "Bearer Authentication")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)

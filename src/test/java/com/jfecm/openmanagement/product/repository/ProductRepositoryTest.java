@@ -1,7 +1,7 @@
-package com.jfecm.openmanagement.product;
+package com.jfecm.openmanagement.product.repository;
 
+import com.jfecm.openmanagement.product.ProductTestDataBuilder;
 import com.jfecm.openmanagement.product.model.Product;
-import com.jfecm.openmanagement.product.repository.ProductRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

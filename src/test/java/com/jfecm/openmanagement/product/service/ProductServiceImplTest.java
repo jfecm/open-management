@@ -1,11 +1,11 @@
-package com.jfecm.openmanagement.product;
+package com.jfecm.openmanagement.product.service;
 
 import com.jfecm.openmanagement.exception.NullProductDataException;
 import com.jfecm.openmanagement.exception.ProductNameAlreadyExistsException;
 import com.jfecm.openmanagement.exception.ResourceNotFoundException;
+import com.jfecm.openmanagement.product.ProductTestDataBuilder;
 import com.jfecm.openmanagement.product.dtos.ProductRequest;
 import com.jfecm.openmanagement.product.repository.ProductRepository;
-import com.jfecm.openmanagement.product.service.ProductServiceImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -76,7 +76,7 @@ class ProductServiceImplTest {
                 .assertThrows(ResourceNotFoundException.class,
                         () -> productService.findOneOrThrow(anyLong()));
 
-        Assertions.assertEquals("No product found with id 0",
+        Assertions.assertEquals("No product found with ID 0",
                 resourceNotFoundException.getMessage());
 
         Mockito.verify(productRepository, times(1)).findById(anyLong());

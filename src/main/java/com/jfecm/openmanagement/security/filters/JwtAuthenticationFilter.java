@@ -1,73 +1,90 @@
 package com.jfecm.openmanagement.security.filters;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jfecm.openmanagement.security.auth.model.UserEntity;
-import com.jfecm.openmanagement.security.jwt.JwtUtils;
+import com.jfecm.openmanagement.security.jwt.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 @Slf4j
-@AllArgsConstructor
-public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private final JwtUtils jwtUtils;
+@RequiredArgsConstructor
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
 
+    /**
+     * Will execute for every http call
+     * @param request request
+     * @param response response
+     * @param filterChain filterChain
+     * @throws ServletException ServletException
+     * @throws IOException IOException
+     */
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request,
-                                                HttpServletResponse response) throws AuthenticationException {
-        UserEntity userEntity;
-        String username;
-        String password;
+    protected void doFilterInternal(
+            @NotNull HttpServletRequest request,
+            @NotNull HttpServletResponse response,
+            @NotNull FilterChain filterChain) throws ServletException, IOException {
 
-        try {
-            userEntity = new ObjectMapper().readValue(request.getInputStream(), UserEntity.class);
-            username   = userEntity.getUsername();
-            password   = userEntity.getPassword();
-        } catch (IOException e) {
-            log.error("error mapping user entity");
-            throw new RuntimeException(e);
+        log.info("Check Jwt token.");
+
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+        log.info("Check Jwt token. AUTHORIZATION && Bearer OK");
 
-        return getAuthenticationManager().authenticate(authenticationToken);
-    }
+        final String jwt     = authHeader.substring(7);
 
-    @Override
-    protected void successfulAuthentication(HttpServletRequest request,
-                                            HttpServletResponse response,
-                                            FilterChain chain,
-                                            Authentication authResult) throws IOException, ServletException {
-        User user = (User) authResult.getPrincipal();
+        final String subject = jwtService.getSubject(jwt);
 
-        String token = jwtUtils.getAccessTokenGenerated(user.getUsername());
+        log.info("Check Jwt token. JWT OK " + jwt);
 
-        response.addHeader("Authorization", token);
+        if (subject != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-        Map<String, Object> httpResponse = new HashMap<>();
-        httpResponse.put("token", token);
-        httpResponse.put("Message", "Successful Authentication");
-        httpResponse.put("Username", user.getUsername());
+            log.info("Check Jwt token. SUBJECT OK " + subject + " The user is not authenticated yet. OK");
 
-        response.getWriter().write(new ObjectMapper().writeValueAsString(httpResponse));
-        response.setStatus(HttpStatus.OK.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.getWriter().flush();
+            UserDetails userDetails = userDetailsService.loadUserByUsername(subject);
 
-        super.successfulAuthentication(request, response, chain, authResult);
+            log.info("Check Jwt token. UserDetails data OK " + userDetails);
+
+            if (jwtService.isTokenValid(jwt, userDetails)) {
+
+                log.info("Check Jwt token. Token valid OK - Updating the SecurityContextHolder");
+
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
+
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+
+            log.info("SecurityContextHolder status. " + SecurityContextHolder.getContext().getAuthentication());
+        }
+
+        filterChain.doFilter(request, response);
     }
 }
