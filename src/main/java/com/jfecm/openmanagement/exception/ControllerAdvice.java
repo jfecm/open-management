@@ -103,4 +103,14 @@ public class ControllerAdvice {
         errorResponse.setTimestamp(System.currentTimeMillis());
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(value = JwtValidationException.class)
+    public ResponseEntity<ErrorMessage> jwtValidationException(JwtValidationException ex, WebRequest request) {
+        ErrorMessage errorResponse = new ErrorMessage();
+        errorResponse.setStatusCode(HttpStatus.CONFLICT.value());
+        errorResponse.setMessage(ex.getMessage());
+        errorResponse.setRequestDescription(request.getDescription(false));
+        errorResponse.setTimestamp(System.currentTimeMillis());
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
 }

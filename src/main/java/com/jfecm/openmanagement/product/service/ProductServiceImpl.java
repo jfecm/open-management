@@ -19,7 +19,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product savedProduct = productRepository.save(productModelMapper.toEntity(product));
         log.info("Product created successfully with ID: {}", savedProduct.getId());
-        return productModelMapper.ToResponse(savedProduct);
+        return productModelMapper.toResponse(savedProduct);
     }
 
     @Override
@@ -53,7 +52,7 @@ public class ProductServiceImpl implements ProductService {
         log.debug("Getting product with ID: {}", id);
         Product product = findOneOrThrow(id);
         log.trace("Product details: {}", product);
-        return productModelMapper.ToResponse(product);
+        return productModelMapper.toResponse(product);
     }
 
     @Override
@@ -98,7 +97,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("Total Size after filtering: {}", products.getTotalElements());
         log.debug("Converting each Product entity to a ProductResponse entity");
         // Convert each Product entity to a ProductResponse entity
-        return products.map(productModelMapper::ToResponse);
+        return products.map(productModelMapper::toResponse);
     }
 
     @Override
@@ -107,7 +106,7 @@ public class ProductServiceImpl implements ProductService {
 
         List<Product> products = productRepository.findByAvailableQuantityLessThan(Constants.LOW_STOCK_THRESHOLD);
 
-        List<ProductResponse> productResponses = products.stream().map(productModelMapper::ToResponse).collect(Collectors.toList());
+        List<ProductResponse> productResponses = products.stream().map(productModelMapper::toResponse).toList();
 
         log.debug("ProductResponses with low stock: {}", productResponses);
 
@@ -124,7 +123,7 @@ public class ProductServiceImpl implements ProductService {
 
         log.info("Product details after updated successfully {}", updatedProduct);
 
-        return productModelMapper.ToResponse(updatedProduct);
+        return productModelMapper.toResponse(updatedProduct);
     }
 
     @Override
@@ -139,7 +138,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("Product stock updated successfully with ID: {}", id);
         log.info("Product details after stock update: {}", updatedProduct);
 
-        return productModelMapper.ToResponse(updatedProduct);
+        return productModelMapper.toResponse(updatedProduct);
     }
 
     @Override
@@ -153,7 +152,7 @@ public class ProductServiceImpl implements ProductService {
 
         log.info("Product details after sale status update: {}", updatedProduct);
 
-        return productModelMapper.ToResponse(updatedProduct);
+        return productModelMapper.toResponse(updatedProduct);
     }
 
     @Override
@@ -168,7 +167,7 @@ public class ProductServiceImpl implements ProductService {
 
         log.info("Product details after stock and sale status update: {}", updatedProduct);
 
-        return productModelMapper.ToResponse(updatedProduct);
+        return productModelMapper.toResponse(updatedProduct);
     }
 
     @Override

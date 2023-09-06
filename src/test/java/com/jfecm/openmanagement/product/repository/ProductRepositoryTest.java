@@ -83,7 +83,7 @@ class ProductRepositoryTest {
         Page<Product> productsPage = productRepository.findAll(specification, pageable);
 
         // then
-        assertThat(productsPage.getContent().size()).isEqualTo(1);
+        assertThat(productsPage.getContent()).hasSize(1);
     }
 
     @Test
@@ -109,9 +109,7 @@ class ProductRepositoryTest {
         // when
         List<Product> resultList = productRepository.findByAvailableQuantityLessThan(lowStockThreshold);
         // then
-        assertThat(resultList).isNotNull();
-        assertThat(resultList).isNotEmpty();
-        assertThat(resultList.size()).isEqualTo(2);
+        assertThat(resultList).isNotNull().isNotEmpty().hasSize(2);
     }
 
     @Test
@@ -122,10 +120,8 @@ class ProductRepositoryTest {
         // when
         List<Product> resultList = productRepository.findByAvailableQuantityLessThan(lowStockThreshold);
         // then
-        assertThat(resultList).isNotNull();
-        assertThat(resultList).isNotEmpty();
+        assertThat(resultList).isNotNull().isNotEmpty().hasSize(1);
         assertThat(resultList.size()).isNotEqualTo(2);
-        assertThat(resultList.size()).isEqualTo(1);
     }
 
     @Test
@@ -136,7 +132,7 @@ class ProductRepositoryTest {
         // when
         boolean result = productRepository.findByName(name);
         // then
-        assertThat(result).isEqualTo(true);
+        assertThat(result).isTrue();
     }
 
     @Test
@@ -147,7 +143,7 @@ class ProductRepositoryTest {
         // when
         Boolean result = productRepository.findByName(name);
         // then
-        assertThat(result).isEqualTo(false);
+        assertThat(result).isFalse();
     }
 
     @Test

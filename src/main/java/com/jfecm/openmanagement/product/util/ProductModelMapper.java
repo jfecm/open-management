@@ -20,7 +20,7 @@ public class ProductModelMapper {
         return modelMapper.map(productRequest, Product.class);
     }
 
-    public ProductResponse ToResponse(Product product) {
+    public ProductResponse toResponse(Product product) {
         return modelMapper.map(product, ProductResponse.class);
     }
 

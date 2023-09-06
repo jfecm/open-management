@@ -1,17 +1,31 @@
-# syntax=docker/dockerfile:1
-FROM eclipse-temurin:17-jdk-jammy
+# Stage 1: Compile the application
+FROM maven:3.8.5-openjdk-17 AS build
+
+ENV MAVEN_OPTS="-Xmx512m"
 
 WORKDIR /app
 
-# For run mvn dependency
-COPY ../.mvn ./.mvn
-COPY ../mvnw ../pom.xml ./
+COPY pom.xml .
+COPY src ./src
 
-# Install dependencies.
-RUN ./mvnw dependency:resolve
+# LABEL for the compile stage
+LABEL description="Open Management Application - Build Stage"
+LABEL maintainer="JFECM<jfecm.dev@gmail.com>"
 
-# Add source code into the image
-COPY ../src ./src
+# Skip tests during build
+RUN mvn clean package -DskipTests
 
-# Run
-CMD ["./mvnw", "spring-boot:run"]
+# Stage 2: Create a smaller image for runtime
+FROM openjdk:17-jdk-slim
+
+WORKDIR /app
+
+# Copy only the resulting JAR artifact from stage 11
+COPY --from=build /app/target/*.jar app.jar
+
+# LABEL for the execution stage
+LABEL description="Open Management Application - Runtime Stage"
+LABEL maintainer="JFECM<jfecm.dev@gmail.com>"
+
+# CMD to run the application
+CMD ["java", "-jar", "app.jar"]

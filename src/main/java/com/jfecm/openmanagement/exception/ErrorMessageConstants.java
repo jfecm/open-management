@@ -1,6 +1,10 @@
 package com.jfecm.openmanagement.exception;
 
 public final class ErrorMessageConstants {
+
+    private ErrorMessageConstants() {
+    }
+
     public static final String NULL_PRODUCT_DATA = "Product data cannot be null.";
     public static final String PRODUCT_NAME_ALREADY_EXISTS = "A product with the same name already exists.";
     public static final String PRODUCT_NOT_FOUND = "No product found with ID ";
