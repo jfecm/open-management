@@ -14,5 +14,6 @@ public class ProductFilter {
     private Double maxPrice;
     private Boolean onSale;
     private Boolean inStock;
+    private Boolean inOffer;
     private Integer availableQuantity;
 }

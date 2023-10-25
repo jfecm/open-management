@@ -4,9 +4,12 @@ import com.jfecm.openmanagement.auth.request.AuthRegisterRequest;
 import com.jfecm.openmanagement.auth.request.AuthRequest;
 import com.jfecm.openmanagement.auth.response.AuthResponse;
 import com.jfecm.openmanagement.exception.DuplicateUsernameException;
+import com.jfecm.openmanagement.exception.EmailAlreadyExistsException;
+import com.jfecm.openmanagement.exception.RegistrationException;
 import com.jfecm.openmanagement.security.jwt.JwtService;
 import com.jfecm.openmanagement.user.model.User;
 import com.jfecm.openmanagement.user.repository.UserRepository;
+import jakarta.validation.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -30,7 +34,9 @@ public class AuthService {
      * @return Token.
      */
     public AuthResponse register(AuthRegisterRequest request) {
+        try {
         verifyDuplicateUsername(request.getUsername());
+        verifyDuplicateEmail(request.getEmail());
 
         User user = User
                 .builder()
@@ -48,6 +54,18 @@ public class AuthService {
                 .builder()
                 .accessToken(jwtToken)
                 .build();
+        } catch (IllegalArgumentException e) {
+            throw new RegistrationException(e.getMessage());
+        } catch (ConstraintViolationException  ex) {
+            StringBuilder validationErrors = new StringBuilder("Validation failed for the following fields:\n");
+
+            Set<ConstraintViolation<?>> violations = ex.getConstraintViolations();
+            for (ConstraintViolation<?> violation : violations) {
+                validationErrors.append("- ").append(violation.getPropertyPath()).append(": ").append(violation.getMessage()).append("\n");
+            }
+
+            throw new RegistrationException(validationErrors.toString());
+        }
     }
 
     /**
@@ -98,5 +116,11 @@ public class AuthService {
             throw new DuplicateUsernameException("The specified username is already in use.");
         }
 
+    }
+
+    private void verifyDuplicateEmail(String email) {
+        if (repository.findByEmail(email).isPresent()) {
+            throw new EmailAlreadyExistsException("Duplicate email. Please choose another email.");
+        }
     }
 }

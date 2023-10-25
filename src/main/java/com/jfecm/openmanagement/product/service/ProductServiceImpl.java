@@ -89,6 +89,10 @@ public class ProductServiceImpl implements ProductService {
             specification = specification.and((root, query, builder) -> builder.lessThan(root.get("availableQuantity"), filter.getAvailableQuantity()));
         }
 
+        if (filter.getInOffer() != null) {
+            specification = specification.and((root, query, builder) -> builder.lessThan(root.get("inOffer"), filter.getInOffer()));
+        }
+
         log.info("Total Size before filtering: {}", productRepository.findAll().size());
         log.debug("Executing the query to retrieve products based on the provided filter and pageable");
         // Get the product page using the spec and the pageable

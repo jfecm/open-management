@@ -5,6 +5,7 @@ import com.jfecm.openmanagement.auth.request.AuthRequest;
 import com.jfecm.openmanagement.auth.response.AuthResponse;
 import com.jfecm.openmanagement.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,14 +20,14 @@ public class AuthController {
 
     @PostMapping("/sign-in")
     public ResponseEntity<AuthResponse> signIn(
-            @RequestBody AuthRequest request
+            @Valid @RequestBody AuthRequest request
     ) {
         return ResponseEntity.ok(service.signIn(request));
     }
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(
-            @RequestBody AuthRegisterRequest request
+            @Valid @RequestBody AuthRegisterRequest request
     ) {
         return ResponseEntity.ok(service.register(request));
     }

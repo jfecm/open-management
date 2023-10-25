@@ -23,16 +23,16 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Email
-    @NotBlank
+    @Email(message = "The email must be a valid email address.")
+    @NotBlank(message = "email is required")
     @Size(max = 80, message = "The email cannot have more than 80 characters")
     @Column(nullable = false, unique = true)
     private String email;
-    @NotBlank
+    @NotBlank(message = "username is required")
     @Size(max = 30, message = "The username cannot have more than 30 characters")
     @Column(nullable = false)
     private String username;
-    @NotBlank
+    @NotBlank(message = "Password is required")
     private String password;
     @Enumerated(EnumType.STRING)
     private Role role;

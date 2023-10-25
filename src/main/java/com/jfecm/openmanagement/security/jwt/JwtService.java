@@ -1,6 +1,5 @@
 package com.jfecm.openmanagement.security.jwt;
 
-import com.jfecm.openmanagement.exception.JwtValidationException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -43,17 +42,12 @@ public class JwtService {
      * @return Claims
      */
     private Claims extractAllClaims(String token) {
-        try {
-            return Jwts
+        return Jwts
                     .parserBuilder()
                     .setSigningKey(getSignInKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-
-        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | IllegalArgumentException e) {
-            throw new JwtValidationException(e.getMessage());
-        }
     }
 
     /**
